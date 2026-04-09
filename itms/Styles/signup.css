@@ -1,0 +1,112 @@
+/* -------------------- SIGNUP PAGE -------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #f5f8fc, #e5edf4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #333;
+  animation: fadeIn 0.8s ease;
+}
+
+.container {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  width: 420px;
+  text-align: center;
+  animation: slideUp 1s ease;
+}
+
+h2 {
+  color: #0d3b66;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  border-bottom: 3px solid #0d3b66;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input,
+select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #0d3b66;
+  box-shadow: 0 0 6px rgba(13, 59, 102, 0.2);
+  outline: none;
+}
+
+button {
+  background: #0d3b66;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: #faa916;
+  transform: scale(1.05);
+}
+
+.redirect-link {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #555;
+}
+
+.redirect-link a {
+  color: #0d3b66;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.redirect-link a:hover {
+  color: #faa916;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

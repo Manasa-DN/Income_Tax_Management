@@ -1,0 +1,114 @@
+/* -------------------- TAX AUTHORITY DASHBOARD -------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #f6faff, #e8eef7);
+  color: #333;
+  animation: fadeIn 0.8s ease;
+  padding: 0;
+}
+
+/* Container */
+.container {
+  max-width: 1000px;
+  margin: 100px auto 40px auto;
+  background: #fff;
+  border-radius: 14px;
+  padding: 30px 40px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.7s ease;
+}
+
+/* Header */
+h1 {
+  text-align: center;
+  color: #0d3b66;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* Buttons */
+button {
+  background: #0d3b66;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: #faa916;
+  transform: scale(1.05);
+}
+
+/* Table Styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+  text-align: center;
+  font-size: 15px;
+}
+
+table th {
+  background: #0d3b66;
+  color: #fff;
+  padding: 12px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+table td {
+  background: #f9fbff;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  transition: background 0.3s ease;
+}
+
+table tr:nth-child(even) td {
+  background: #f2f5fb;
+}
+
+table tr:hover td {
+  background: #eef3ff;
+}
+
+a {
+  color: #0d3b66;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #faa916;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

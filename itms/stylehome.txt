@@ -1,0 +1,125 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f2f2; /* Ensure background color is black */
+    color: #b64848; /* Change font color to white for better contrast */
+
+    /* Background Image */
+    background-image: url('images/income.jpeg'); /* Make sure the path is correct */
+    background-size: cover;        /* Cover the entire page */
+    background-position: center;   /* Center the image */
+    background-repeat: no-repeat;  /* Avoid repeating the image */
+    background-attachment: fixed;  /* Keep the background fixed when scrolling */
+    line-height: 1.6;
+    position: relative; /* Required for overlay effect */
+}
+
+/* Optional: Add a dark overlay */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(247, 245, 245, 0.966); /* Black overlay with 50% opacity */
+    z-index: -1; /* Place the overlay behind content */
+}
+
+/* Header Styling */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1a73e8;
+    color: #fff;
+    padding: 15px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Rest of your styles here */
+
+.header-left .login-btn {
+    background-color: #fff;
+    color: #1a73e8;
+    padding: 8px 18px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 25px;
+    transition: 0.3s;
+}
+
+.header-left .login-btn:hover {
+    background-color: #ff4757;
+    color: #fff;
+}
+
+.header-right h1 {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+/* Main Content Styling */
+main {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    padding: 0 20px;
+    flex-wrap: wrap;
+}
+
+.compartment {
+    width: 28%;
+    padding: 25px;
+    background-color: #b32e2e;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(27, 27, 27, 0.1);
+    transition: 0.3s ease-in-out;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.compartment:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.compartment h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #1a73e8;
+}
+
+.compartment ul {
+    list-style-type: none;
+    margin-top: 15px;
+}
+
+.compartment ul li {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #d8d6d6;
+    text-align: left;
+}
+
+.compartment ul li::before {
+    content: '•';
+    color: #ff4757;
+    font-weight: bold;
+    display: inline-block; 
+    width: 1em;
+    margin-left: -1em;
+}
+
+main .welcome-section p a {
+  color: red; /* Default color before hover or click */
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.4s ease, transform 0.3s ease; /* Smooth animation */
+}

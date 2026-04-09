@@ -1,0 +1,50 @@
+/* -------------------- PAYMENTS PAGE STYLING -------------------- */
+body {
+    background: linear-gradient(135deg, #f8f9fb, #e1e8f0);
+    font-family: 'Segoe UI', sans-serif;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.9s ease-in;
+}
+
+h2 {
+    color: #0d3b66;
+    font-size: 1.8rem;
+    border-bottom: 3px solid #0d3b66;
+    margin-bottom: 25px;
+    padding-bottom: 8px;
+    animation: slideDown 1s ease;
+} 
+
+ul {
+    list-style: none;
+    width: 90%;
+    max-width: 700px;
+}
+
+ul li {
+    background: #ffffff;
+    padding: 15px 20px;
+    color: rgb(0, 47, 255);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+ul li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 18px rgba(0,0,0,0.12);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-25px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

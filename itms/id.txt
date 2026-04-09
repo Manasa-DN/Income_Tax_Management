@@ -1,0 +1,536 @@
+bro one last help i want you to create the same type of css for all these 
+
+
+
+8.refunds.php
+<?php
+session_start();
+include 'db.php';
+
+if (!isset($_SESSION['user_id'])) {
+    die('Not logged in.');
+}
+$user_id = intval($_SESSION['user_id']);
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+
+// Table tax_refunds(user_id, amount, status, requested_at)
+$table_check = $conn->query("SHOW TABLES LIKE 'tax_refunds'");
+if (!$table_check || $table_check->num_rows === 0) {
+    echo "No tax_refunds table. Please import newone.sql.";
+    exit;
+}
+
+if ($role === 'taxpayer') {
+    $stmt = $conn->prepare("SELECT amount, status, requested_at FROM tax_refunds WHERE user_id = ? ORDER BY requested_at DESC");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $rows = $stmt->get_result();
+} elseif ($role === 'taxprofessional') {
+    $stmt = $conn->prepare("SELECT TR.amount, TR.status, TR.requested_at, T.Name AS taxpayer_name FROM tax_refunds TR JOIN Taxpayer T ON T.user_id = TR.user_id WHERE T.tax_professional_id = ? ORDER BY TR.requested_at DESC");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $rows = $stmt->get_result();
+} elseif ($role === 'taxauthority') {
+    $rows = $conn->query("SELECT TR.amount, TR.status, TR.requested_at, T.Name AS taxpayer_name FROM tax_refunds TR JOIN Taxpayer T ON T.user_id = TR.user_id ORDER BY TR.requested_at DESC");
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tax Refunds</title>
+</head>
+<body>
+<h2>Tax Refunds</h2>
+<ul>
+<?php while ($r = $rows->fetch_assoc()) { ?>
+    <li>
+        ₹<?php echo htmlspecialchars($r['amount']); ?> — <?php echo htmlspecialchars($r['status']); ?> — <?php echo htmlspecialchars($r['requested_at']); ?>
+        <?php if (!empty($r['taxpayer_name'])) { ?> — <?php echo htmlspecialchars($r['taxpayer_name']); ?><?php } ?>
+    </li>
+<?php } ?>
+</ul>
+</body>
+</html>
+
+
+9.payments.php
+<?php
+session_start();
+include 'db.php';
+
+if (!isset($_SESSION['user_id'])) {
+    die('Not logged in.');
+}
+$user_id = intval($_SESSION['user_id']);
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+
+// Use tax_revenues as payments for now
+if ($role === 'taxpayer') {
+    $stmt = $conn->prepare("SELECT amount, created_at FROM tax_revenues WHERE user_id = ? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $rows = $stmt->get_result();
+} elseif ($role === 'taxprofessional') {
+    $stmt = $conn->prepare("SELECT TR.amount, TR.created_at, T.Name AS taxpayer_name FROM tax_revenues TR JOIN Taxpayer T ON T.user_id = TR.user_id WHERE TR.tax_professional_id = ? ORDER BY TR.created_at DESC");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $rows = $stmt->get_result();
+} elseif ($role === 'taxauthority') {
+    $rows = $conn->query("SELECT TR.amount, TR.created_at, T.Name AS taxpayer_name FROM tax_revenues TR JOIN Taxpayer T ON T.user_id = TR.user_id ORDER BY TR.created_at DESC");
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Payments</title>
+</head>
+<body>
+<h2>Payments</h2>
+<ul>
+<?php while ($r = $rows->fetch_assoc()) { ?>
+    <li>
+        ₹<?php echo htmlspecialchars($r['amount']); ?> — <?php echo htmlspecialchars($r['created_at']); ?>
+        <?php if (!empty($r['taxpayer_name'])) { ?>
+            — <?php echo htmlspecialchars($r['taxpayer_name']); ?>
+        <?php } ?>
+    </li>
+<?php } ?>
+</ul>
+</body>
+</html>
+
+
+
+10.error_logs.php
+<?php
+session_start();
+include 'db.php';
+
+if (!isset($_SESSION['user_id'])) {
+    die('Not logged in.');
+}
+$user_id = intval($_SESSION['user_id']);
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+
+// Simple error logs table: error_logs(user_id, role, message, created_at)
+$table_check = $conn->query("SHOW TABLES LIKE 'error_logs'");
+if (!$table_check || $table_check->num_rows === 0) {
+    echo "No error logs table. Please import newone.sql.";
+    exit;
+}
+
+if ($role === 'taxauthority') {
+    $rows = $conn->query("SELECT user_id, role, message, created_at FROM error_logs ORDER BY created_at DESC");
+} else {
+    $stmt = $conn->prepare("SELECT role, message, created_at FROM error_logs WHERE user_id = ? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $rows = $stmt->get_result();
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Error Logs</title>
+}</head>
+<body>
+<h2>Error Logs</h2>
+<ul>
+<?php while ($r = $rows->fetch_assoc()) { ?>
+    <li>
+        <?php if (!empty($r['user_id'])) { ?>User: <?php echo (int)$r['user_id']; ?> — <?php } ?>
+        <?php echo htmlspecialchars($r['role'] ?? ''); ?> —
+        <?php echo htmlspecialchars($r['message']); ?> —
+        <?php echo htmlspecialchars($r['created_at']); ?>
+    </li>
+<?php } ?>
+</ul>
+</body>
+</html>
+
+
+11.addprofessional.php
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    include 'db.php';
+
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $tin = $_POST['tin'];
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT); // Hash the password
+    $certification_id = $_POST['certification_id'];
+
+    // Call the stored procedure to add a tax professional
+    $query = "CALL AddTaxProfessional(?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sssssi", $name, $email, $phone, $tin, $password, $certification_id);
+
+    if ($stmt->execute()) {
+        echo "Tax Professional added successfully.";
+    } else {
+        echo "Error: " . $conn->error;
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add TaxProfessional</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #E0E0E0; /* Light text */
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #333333; /* Dark background for the form */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff; /* White text for header */
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"] {
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #555555; /* Darker border */
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #444444; /* Dark background for inputs */
+            color: #ffffff; /* White text in input fields */
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+            border-color: #007BFF; /* Blue focus border */
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF; /* Blue button */
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 18px;
+            color: #32CD32; /* Green color for success message */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            input[type="text"], input[type="email"], input[type="password"] {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Tax Professional</h1>
+        <form method="POST" action="">
+            <input type="text" name="name" placeholder="Name" required><br>
+            <input type="email" name="email" placeholder="Email" required><br>
+            <input type="text" name="phone" placeholder="Phone" required><br>
+            <input type="text" name="tin" placeholder="TIN" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <input type="text" name="certification_id" placeholder="Certification ID" required><br>
+            <button type="submit">Add Professional</button>
+        </form>
+        <?php
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($stmt) && $stmt->execute()) {
+            echo "<div class='message'>Tax Professional added successfully.</div>";
+        }
+        ?>
+    </div>
+</body>
+</html>
+
+12.admin.php
+<?php
+session_start();
+include 'db.php';
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header('Location: login.php');
+    exit;
+}
+
+// Handle CRUD operations
+$message = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    if ($action === 'add_taxpayer') {
+        $name = $_POST['name']; $email = $_POST['email']; $phone = $_POST['phone'];
+        $address = $_POST['address'] ?? '';
+        $pwd = password_hash('password123', PASSWORD_DEFAULT);
+        $tin = 'TIN' . rand(1000,9999);
+        $conn->begin_transaction();
+        try {
+            $u = $conn->prepare("INSERT INTO User(name,password,role,email,phone) VALUES(?,?,?,?,?)");
+            $role_user = 'taxpayer';
+            $u->bind_param('sssss', $name, $pwd, $role_user, $email, $phone);
+            $u->execute(); $uid = $conn->insert_id;
+            $t = $conn->prepare("INSERT INTO Taxpayer(user_id, name, tin, address, email, phone, RegistrationDate, Password) VALUES(?,?,?,?,?,?,NOW(),?)");
+            $t->bind_param('issssss', $uid, $name, $tin, $address, $email, $phone, $pwd);
+            $t->execute();
+            $conn->commit();
+            $message = 'Taxpayer added';
+        } catch (Exception $e) { $conn->rollback(); $message = 'Error: '.$e->getMessage(); }
+    } elseif ($action === 'add_professional') {
+        $name = $_POST['name']; $email = $_POST['email']; $phone = $_POST['phone'];
+        $pwd = password_hash('password123', PASSWORD_DEFAULT);
+        $tin = 'TIN' . rand(1000,9999); $cert = 'CERT' . rand(1000,9999);
+        $conn->begin_transaction();
+        try {
+            $u = $conn->prepare("INSERT INTO User(name,password,role,email,phone) VALUES(?,?,?,?,?)");
+            $role_user = 'taxprofessional';
+            $u->bind_param('sssss', $name, $pwd, $role_user, $email, $phone);
+            $u->execute(); $uid = $conn->insert_id;
+            $t = $conn->prepare("INSERT INTO TaxProfessional(user_id, name, tin, Certification_ID, email, phone, RegistrationDate, Password) VALUES(?,?,?,?,?,?,NOW(),?)");
+            $t->bind_param('issssss', $uid, $name, $tin, $cert, $email, $phone, $pwd);
+            $t->execute();
+            $conn->commit();
+            $message = 'Professional added';
+        } catch (Exception $e) { $conn->rollback(); $message = 'Error: '.$e->getMessage(); }
+    } elseif ($action === 'add_authority') {
+        $name = $_POST['name']; $email = $_POST['email']; $phone = $_POST['phone'];
+        $pwd = password_hash('password123', PASSWORD_DEFAULT);
+        $conn->begin_transaction();
+        try {
+            $u = $conn->prepare("INSERT INTO User(name,password,role,email,phone) VALUES(?,?,?,?,?)");
+            $role_user = 'taxauthority';
+            $u->bind_param('sssss', $name, $pwd, $role_user, $email, $phone);
+            $u->execute(); $uid = $conn->insert_id;
+            $t = $conn->prepare("INSERT INTO TaxAuthority(user_id, Name, Email, Phone, Designation, Department) VALUES(?,?,?,?, 'Officer', 'Income Dept')");
+            $t->bind_param('isss', $uid, $name, $email, $phone);
+            $t->execute();
+            $conn->commit();
+            $message = 'Authority added';
+        } catch (Exception $e) { $conn->rollback(); $message = 'Error: '.$e->getMessage(); }
+    } elseif ($action === 'delete_user') {
+        $uid = intval($_POST['user_id']);
+        $conn->begin_transaction();
+        try {
+            // If deleting a professional, detach assigned taxpayers
+            $upd = $conn->prepare("UPDATE Taxpayer SET tax_professional_id = NULL WHERE tax_professional_id = ?");
+            $upd->bind_param('i', $uid);
+            $upd->execute();
+
+            // Delete dependent rows for taxpayer entity mapping to this user
+            // Resolve TaxpayerID first (may not exist if not a taxpayer)
+            $tx = $conn->prepare("SELECT TaxpayerID FROM Taxpayer WHERE user_id = ?");
+            $tx->bind_param('i', $uid);
+            $tx->execute();
+            $tx->bind_result($taxpayerId);
+            $taxpayerIdVal = null;
+            if ($tx->fetch()) { $taxpayerIdVal = $taxpayerId; }
+            $tx->close();
+
+            if (!is_null($taxpayerIdVal)) {
+                $delNotif = $conn->prepare("DELETE FROM Notification WHERE UserID = ?");
+                $delNotif->bind_param('i', $taxpayerIdVal);
+                $delNotif->execute();
+            }
+
+            // Remove per-user artifacts
+            $del = $conn->prepare("DELETE FROM tax_revenues WHERE user_id = ?");
+            $del->bind_param('i', $uid);
+            $del->execute();
+
+            $del = $conn->prepare("DELETE FROM Documents WHERE user_id = ?");
+            $del->bind_param('i', $uid);
+            $del->execute();
+
+            $del = $conn->prepare("DELETE FROM tax_refunds WHERE user_id = ?");
+            $del->bind_param('i', $uid);
+            $del->execute();
+
+            // Delete role rows (whichever exist)
+            $del = $conn->prepare("DELETE FROM Taxpayer WHERE user_id = ?");
+            $del->bind_param('i', $uid);
+            $del->execute();
+
+            $del = $conn->prepare("DELETE FROM TaxProfessional WHERE user_id = ?");
+            $del->bind_param('i', $uid);
+            $del->execute();
+
+            $del = $conn->prepare("DELETE FROM TaxAuthority WHERE user_id = ?");
+            $del->bind_param('i', $uid);
+            $del->execute();
+
+            // Finally delete the base user
+            $del = $conn->prepare("DELETE FROM User WHERE id = ?");
+            $del->bind_param('i', $uid);
+            $del->execute();
+
+            $conn->commit();
+            $message = 'User deleted';
+        } catch (Exception $e) {
+            $conn->rollback();
+            $message = 'Delete failed: ' . $e->getMessage();
+        }
+    }
+}
+
+// Fetch lists
+$taxpayers = $conn->query("SELECT user_id, Name, Email FROM Taxpayer ORDER BY Name");
+$pros = $conn->query("SELECT user_id, Name, Email FROM TaxProfessional ORDER BY Name");
+$auths = $conn->query("SELECT user_id, Name, Email FROM TaxAuthority ORDER BY Name");
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <style>
+        body { background:#0f1115; color:#e9eef5; font-family: Arial, sans-serif; margin:0; }
+        header { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:#1a1f2b; position:sticky; top:0; }
+        header h1 { margin:0; font-size:20px; }
+        a.link { color:#35F374; text-decoration:none; margin-left:12px; }
+        .wrap { display:grid; grid-template-columns: 1fr 1fr; gap:20px; padding:20px; }
+        .card { background:#1a1f2b; border-radius:10px; padding:16px; box-shadow:0 6px 18px rgba(0,0,0,.25); }
+        .card h2 { margin:0 0 10px 0; font-size:18px; }
+        input, button { padding:10px; border-radius:6px; border:1px solid #2b3243; background:#111623; color:#e9eef5; margin:6px 6px 6px 0; }
+        button { background:#35F374; color:#0b0f14; border:none; cursor:pointer; }
+        table { width:100%; border-collapse: collapse; margin-top:10px; }
+        th, td { border:1px solid #2b3243; padding:8px; text-align:left; }
+        .msg { margin: 0 20px; color:#35F374; }
+    </style>
+    <script>
+        function confirmDelete(uid){ if(confirm('Delete this user?')){ document.getElementById('del-user-id').value=uid; document.getElementById('del-form').submit(); } }
+    </script>
+</head>
+<body>
+<header>
+    <h1>Admin Panel</h1>
+    <div>
+        <a class="link" href="home.php">Home</a>
+        <a class="link" href="logout.php">Logout</a>
+    </div>
+</header>
+<?php if ($message) { echo '<p class="msg">'.htmlspecialchars($message).'</p>'; } ?>
+<div class="wrap">
+    <div class="card">
+        <h2>Add Taxpayer</h2>
+        <form method="POST">
+            <input type="hidden" name="action" value="add_taxpayer" />
+            <input name="name" placeholder="Name" required />
+            <input name="email" placeholder="Email" required />
+            <input name="phone" placeholder="Phone" required />
+            <input name="address" placeholder="Address" />
+            <button type="submit">Add</button>
+        </form>
+        <h2>Taxpayers</h2>
+        <table>
+            <tr><th>Name</th><th>Email</th><th>Action</th></tr>
+            <?php while($r=$taxpayers->fetch_assoc()){ ?>
+            <tr>
+                <td><?php echo htmlspecialchars($r['Name']); ?></td>
+                <td><?php echo htmlspecialchars($r['Email']); ?></td>
+                <td><button onclick="confirmDelete(<?php echo (int)$r['user_id']; ?>)">Delete</button></td>
+            </tr>
+            <?php } ?>
+        </table>
+    </div>
+    <div class="card">
+        <h2>Add Professional</h2>
+        <form method="POST">
+            <input type="hidden" name="action" value="add_professional" />
+            <input name="name" placeholder="Name" required />
+            <input name="email" placeholder="Email" required />
+            <input name="phone" placeholder="Phone" required />
+            <button type="submit">Add</button>
+        </form>
+        <h2>Professionals</h2>
+        <table>
+            <tr><th>Name</th><th>Email</th><th>Action</th></tr>
+            <?php while($r=$pros->fetch_assoc()){ ?>
+            <tr>
+                <td><?php echo htmlspecialchars($r['Name']); ?></td>
+                <td><?php echo htmlspecialchars($r['Email']); ?></td>
+                <td><button onclick="confirmDelete(<?php echo (int)$r['user_id']; ?>)">Delete</button></td>
+            </tr>
+            <?php } ?>
+        </table>
+    </div>
+    <div class="card">
+        <h2>Add Authority</h2>
+        <form method="POST">
+            <input type="hidden" name="action" value="add_authority" />
+            <input name="name" placeholder="Name" required />
+            <input name="email" placeholder="Email" required />
+            <input name="phone" placeholder="Phone" required />
+            <button type="submit">Add</button>
+        </form>
+        <h2>Authorities</h2>
+        <table>
+            <tr><th>Name</th><th>Email</th><th>Action</th></tr>
+            <?php while($r=$auths->fetch_assoc()){ ?>
+            <tr>
+                <td><?php echo htmlspecialchars($r['Name']); ?></td>
+                <td><?php echo htmlspecialchars($r['Email']); ?></td>
+                <td><button onclick="confirmDelete(<?php echo (int)$r['user_id']; ?>)">Delete</button></td>
+            </tr>
+            <?php } ?>
+        </table>
+    </div>
+</div>
+<form id="del-form" method="POST" style="display:none;">
+    <input type="hidden" name="action" value="delete_user" />
+    <input type="hidden" id="del-user-id" name="user_id" value="" />
+    </form>
+</body>
+</html>
+
+
+
+add the css and give me the updated code sepearately with the css animation and javascript to look it more professional and formal as per the above one that yponly so bro give me the code seperately with the name  
+
+

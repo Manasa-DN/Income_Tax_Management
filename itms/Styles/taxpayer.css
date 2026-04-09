@@ -1,0 +1,305 @@
+/* -------------------- GENERAL RESET -------------------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* -------------------- BODY -------------------- */
+body {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #333;
+}
+
+/* -------------------- HEADER -------------------- */
+header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  background-color: #0b3d91; /* Dark Blue */
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.8s ease;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+}
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+header a {
+  color: #f4a300;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+header a:hover {
+  color: #f9c74f;
+}
+
+.profile-icon {
+  background-color: #ffffff33;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 20px;
+}
+
+.profile-icon:hover {
+  background-color: #f4a300;
+  color: #0b3d91;
+  transform: scale(1.1);
+}
+
+/* -------------------- PROFILE CARD -------------------- */
+.profile-card {
+  display: none;
+  position: fixed;
+  top: 70px;
+  right: 50px;
+  background-color: #ffffff;
+  color: #333;
+  border-radius: 10px;
+  padding: 15px 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  animation: fadeInUp 0.5s ease;
+  width: 250px;
+  z-index: 999;
+}
+
+.profile-card h4 {
+  color: #0b3d91;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #0b3d91;
+  padding-bottom: 5px;
+}
+
+.profile-card p {
+  font-size: 15px;
+  margin: 8px 0;
+}
+
+.profile-card a {
+  color: #f4a300;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.profile-card a:hover {
+  color: #0b3d91;
+}
+
+/* -------------------- MAIN CONTENT -------------------- */
+.content {
+  margin-top: 120px;
+  width: 90%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeInUp 1s ease;
+}
+
+.content h2 {
+  color: #0b3d91;
+  margin-bottom: 25px;
+}
+
+/* -------------------- FORM CONTAINER -------------------- */
+.form-container {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 25px 30px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+  animation: fadeInUp 1s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.form-container h3 {
+  color: #0b3d91;
+  border-bottom: 2px solid #0b3d91;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.form-container input,
+.form-container select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+  border-color: #0b3d91;
+  box-shadow: 0 0 5px rgba(11, 61, 145, 0.3);
+}
+
+.form-container button {
+  background-color: #0b3d91;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-container button:hover {
+  background-color: #f4a300;
+  color: #0b3d91;
+}
+
+/* -------------------- TAX CALCULATOR -------------------- */
+.tax-calculator {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 25px 30px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+  text-align: center;
+  animation: fadeInUp 1s ease;
+}
+
+.tax-calculator h3 {
+  color: #0b3d91;
+  margin-bottom: 15px;
+}
+
+.tax-input-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tax-input-group input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: border-color 0.3s ease;
+}
+
+.tax-input-group input:focus {
+  border-color: #0b3d91;
+}
+
+.calculate-btn {
+  background-color: #0b3d91;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.calculate-btn:hover {
+  background-color: #f4a300;
+  color: #0b3d91;
+}
+
+/* -------------------- NOTIFICATION BOX -------------------- */
+.notification-box {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 25px 30px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  animation: fadeInUp 1s ease;
+}
+
+.notification-box h3 {
+  color: #0b3d91;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #0b3d91;
+  padding-bottom: 5px;
+}
+
+.notification-box ul {
+  list-style: none;
+  margin-top: 10px;
+  padding-left: 0;
+}
+
+.notification-box li {
+  padding: 8px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.notification-box li span {
+  color: #f4a300;
+  font-weight: 600;
+}
+
+/* -------------------- ANIMATIONS -------------------- */
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* -------------------- RESPONSIVE -------------------- */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .tax-input-group {
+    flex-direction: column;
+  }
+}
